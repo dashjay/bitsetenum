@@ -1,40 +1,3 @@
-# bitsetenum
-
-A useful tool for generating codes about bitset and enum in golang
-
-# Usage
-
-like example, you can write code like this and then run go generate ./...
-
-```go
-
-package main
-
-import (
-	"github.com/dashjay/bitsetenum"
-)
-
-//go:generate go run main.go
-func main() {
-	rd := bitsetenum.NewRenderWithPackageName("main_test")
-	err := bitsetenum.RenderEnumBitset(rd,
-		bitsetenum.WithTypeName("Status"),
-		bitsetenum.WithEnumNames("Creating", "Normal", "Updating", "CanaryUpdating"),
-		bitsetenum.WithEnumBitsetStyle(bitsetenum.StyleSetWithValue),
-	)
-	if err != nil {
-		panic(err)
-	}
-	err = rd.RenderToFile("main_test/all_test.go")
-	if err != nil {
-		panic(err)
-	}
-}
-```
-
-bitsetenum will help you to generate file like
-
-```go
 package main_test
 
 type Status uint64
@@ -86,8 +49,3 @@ func (s *Status) SetStatusCanaryUpdating(val bool) {
 func (s *Status) GetStatusCanaryUpdating() bool {
 	return (*s)&CanaryUpdating != 0
 }
-```
-
-this can be useful when we want a bitset and enum but don't want to copy a lot of codes
-
-
