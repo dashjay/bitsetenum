@@ -89,5 +89,6 @@ func (s *Status) GetStatusCanaryUpdating() bool {
 ```
 
 this can be useful when we want a bitset and enum but don't want to copy a lot of codes
+then you can easily use it anywhere in your codes
 
 

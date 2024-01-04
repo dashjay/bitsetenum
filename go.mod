@@ -1,5 +1,5 @@
 module github.com/dashjay/bitsetenum
 
-go 1.21.4
+go 1.13
 
-require github.com/dave/jennifer v1.7.0 // indirect
+require github.com/dave/jennifer v1.0.0
