@@ -19,6 +19,7 @@ type EnumBitsetOptions struct {
 	EnumNames       []string
 	StepIn          int
 	EnumBitsetStyle Style
+	Assertion       bool
 }
 
 func checkEBOValidAndSetDefault(e *EnumBitsetOptions) error {
@@ -53,9 +54,16 @@ func WithStepIn(StepIn int) OptionFunc {
 		e.StepIn = StepIn
 	}
 }
+
 func WithEnumBitsetStyle(style Style) OptionFunc {
 	return func(e *EnumBitsetOptions) {
 		e.EnumBitsetStyle = style
+	}
+}
+
+func WithAssertion() OptionFunc {
+	return func(e *EnumBitsetOptions) {
+		e.Assertion = true
 	}
 }
 
@@ -89,15 +97,47 @@ func RenderEnumBitset(r *Render, opts ...OptionFunc) error {
 
 	for i := 0; i < len(ebo.EnumNames); i++ {
 		if ebo.EnumBitsetStyle == StyleSetAndUnset {
-			r.File().Func().Params(Id(receiver).Op("*").Id(ebo.TypeName)).Id(fmt.Sprintf("Set%s%s", ebo.TypeName, ebo.EnumNames[i])).Params().Block(Id("*").Id(receiver).Op("|=").Id(ebo.EnumNames[i]))
-			r.File().Func().Params(Id(receiver).Op("*").Id(ebo.TypeName)).Id(fmt.Sprintf("UnSet%s%s", ebo.TypeName, ebo.EnumNames[i])).Params().Block(Id("*").Id(receiver).Op("&=").Op("^").Id(ebo.EnumNames[i]))
-		} else {
-			r.File().Func().Params(Id(receiver).Id("*").Id(ebo.TypeName)).
-				Id(fmt.Sprintf("Set%s%s", ebo.TypeName, ebo.EnumNames[i])).
-				Params(Id("val").Bool()).
-				Block(
-					If(Id("val")).Block(Id("*").Id(receiver).Op("|=").Id(ebo.EnumNames[i])).Else().Block(Id("*").Id(receiver).Op("&=").Op("^").Id(ebo.EnumNames[i])),
+			{
+				var codes []Code
+				if ebo.Assertion {
+					codes = append(codes, If(Op("(").Id("*").Id(receiver).Op(")").Op("&").Id(ebo.EnumNames[i]).Op("!=").Lit(0)).
+						Block(Panic(Lit("set "+ebo.EnumNames[i]+" assertion failed"))))
+				}
+				codes = append(codes, Op("(").Id("*").Id(receiver).Op(")").Op("|=").Id(ebo.EnumNames[i]))
+
+				r.File().Func().Params(Id(receiver).Op("*").Id(ebo.TypeName)).
+					Id(fmt.Sprintf("Set%s%s", ebo.TypeName, ebo.EnumNames[i])).Params().Block(codes...)
+
+			}
+			{
+				var codes []Code
+				if ebo.Assertion {
+					codes = append(codes, If(Op("(").Id("*").Id(receiver).Op(")").Op("&").Id(ebo.EnumNames[i]).Op("==").Lit(0)).
+						Block(Panic(Lit("set "+ebo.EnumNames[i]+" assertion failed"))))
+				}
+				codes = append(codes, Op("(").Id("*").Id(receiver).Op(")").Op("&=").Op("^").Id(ebo.EnumNames[i]))
+
+				r.File().Func().Params(Id(receiver).Op("*").Id(ebo.TypeName)).
+					Id(fmt.Sprintf("UnSet%s%s", ebo.TypeName, ebo.EnumNames[i])).Params().Block(
+					codes...,
 				)
+			}
+		} else {
+			{
+
+				var codes []Code
+				if ebo.Assertion {
+					codes = append(codes, If(Op("(").Id("*").Id(receiver).Op("&").Id(ebo.EnumNames[i]).Op("==").Lit(0).Op(")").Op("!=").Id("val")).
+						Block(Panic(Lit("set "+ebo.EnumNames[i]+" assertion failed"))))
+				}
+				codes = append(codes, If(Id("val")).Block(Id("*").Id(receiver).Op("|=").Id(ebo.EnumNames[i])).Else().Block(Id("*").Id(receiver).Op("&=").Op("^").Id(ebo.EnumNames[i])))
+				r.File().Func().Params(Id(receiver).Id("*").Id(ebo.TypeName)).
+					Id(fmt.Sprintf("Set%s%s", ebo.TypeName, ebo.EnumNames[i])).
+					Params(Id("val").Bool()).
+					Block(
+						codes...,
+					)
+			}
 		}
 		r.File().Func().Params(Id(receiver).Id("*").Id(ebo.TypeName)).Id(fmt.Sprintf("Get%s%s", ebo.TypeName, ebo.EnumNames[i])).Params().Bool().Block(Return().Id(fmt.Sprintf("(*%s)", receiver)).Id("&").Id(ebo.EnumNames[i]).Id("!=").Lit(0))
 	}

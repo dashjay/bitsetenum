@@ -11,12 +11,14 @@ func main() {
 		bitsetenum.WithTypeName("Status"),
 		bitsetenum.WithEnumNames("Creating", "Normal", "Updating", "CanaryUpdating"),
 		bitsetenum.WithEnumBitsetStyle(bitsetenum.StyleSetWithValue),
+		bitsetenum.WithAssertion(),
 	)
 
 	err = bitsetenum.RenderEnumBitset(rd,
 		bitsetenum.WithTypeName("StatusWithUnset"),
 		bitsetenum.WithEnumNames("Creating1", "Normal1", "Updating1", "CanaryUpdating1"),
 		bitsetenum.WithEnumBitsetStyle(bitsetenum.StyleSetAndUnset),
+		bitsetenum.WithAssertion(),
 	)
 	if err != nil {
 		panic(err)

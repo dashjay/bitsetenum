@@ -11,6 +11,9 @@ const (
 )
 
 func (s *Status) SetStatusCreating(val bool) {
+	if (*s&Creating == 0) != val {
+		panic("set Creating assertion failed")
+	}
 	if val {
 		*s |= Creating
 	} else {
@@ -21,6 +24,9 @@ func (s *Status) GetStatusCreating() bool {
 	return (*s)&Creating != 0
 }
 func (s *Status) SetStatusNormal(val bool) {
+	if (*s&Normal == 0) != val {
+		panic("set Normal assertion failed")
+	}
 	if val {
 		*s |= Normal
 	} else {
@@ -31,6 +37,9 @@ func (s *Status) GetStatusNormal() bool {
 	return (*s)&Normal != 0
 }
 func (s *Status) SetStatusUpdating(val bool) {
+	if (*s&Updating == 0) != val {
+		panic("set Updating assertion failed")
+	}
 	if val {
 		*s |= Updating
 	} else {
@@ -41,6 +50,9 @@ func (s *Status) GetStatusUpdating() bool {
 	return (*s)&Updating != 0
 }
 func (s *Status) SetStatusCanaryUpdating(val bool) {
+	if (*s&CanaryUpdating == 0) != val {
+		panic("set CanaryUpdating assertion failed")
+	}
 	if val {
 		*s |= CanaryUpdating
 	} else {
@@ -61,37 +73,61 @@ const (
 )
 
 func (s *StatusWithUnset) SetStatusWithUnsetCreating1() {
-	*s |= Creating1
+	if (*s)&Creating1 != 0 {
+		panic("set Creating1 assertion failed")
+	}
+	(*s) |= Creating1
 }
 func (s *StatusWithUnset) UnSetStatusWithUnsetCreating1() {
-	*s &= ^Creating1
+	if (*s)&Creating1 == 0 {
+		panic("set Creating1 assertion failed")
+	}
+	(*s) &= ^Creating1
 }
 func (s *StatusWithUnset) GetStatusWithUnsetCreating1() bool {
 	return (*s)&Creating1 != 0
 }
 func (s *StatusWithUnset) SetStatusWithUnsetNormal1() {
-	*s |= Normal1
+	if (*s)&Normal1 != 0 {
+		panic("set Normal1 assertion failed")
+	}
+	(*s) |= Normal1
 }
 func (s *StatusWithUnset) UnSetStatusWithUnsetNormal1() {
-	*s &= ^Normal1
+	if (*s)&Normal1 == 0 {
+		panic("set Normal1 assertion failed")
+	}
+	(*s) &= ^Normal1
 }
 func (s *StatusWithUnset) GetStatusWithUnsetNormal1() bool {
 	return (*s)&Normal1 != 0
 }
 func (s *StatusWithUnset) SetStatusWithUnsetUpdating1() {
-	*s |= Updating1
+	if (*s)&Updating1 != 0 {
+		panic("set Updating1 assertion failed")
+	}
+	(*s) |= Updating1
 }
 func (s *StatusWithUnset) UnSetStatusWithUnsetUpdating1() {
-	*s &= ^Updating1
+	if (*s)&Updating1 == 0 {
+		panic("set Updating1 assertion failed")
+	}
+	(*s) &= ^Updating1
 }
 func (s *StatusWithUnset) GetStatusWithUnsetUpdating1() bool {
 	return (*s)&Updating1 != 0
 }
 func (s *StatusWithUnset) SetStatusWithUnsetCanaryUpdating1() {
-	*s |= CanaryUpdating1
+	if (*s)&CanaryUpdating1 != 0 {
+		panic("set CanaryUpdating1 assertion failed")
+	}
+	(*s) |= CanaryUpdating1
 }
 func (s *StatusWithUnset) UnSetStatusWithUnsetCanaryUpdating1() {
-	*s &= ^CanaryUpdating1
+	if (*s)&CanaryUpdating1 == 0 {
+		panic("set CanaryUpdating1 assertion failed")
+	}
+	(*s) &= ^CanaryUpdating1
 }
 func (s *StatusWithUnset) GetStatusWithUnsetCanaryUpdating1() bool {
 	return (*s)&CanaryUpdating1 != 0
